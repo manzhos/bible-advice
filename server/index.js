@@ -12,9 +12,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.raw());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/api/test', (req, res) => res.send('Hello World'));
+app.get('/test', (req, res) => res.send('Hello World'));
 
-app.post('/api/advice', async (req, res) => {
+app.post('/advice', async (req, res) => {
   const { textQ } = req.body;
 
   const { GoogleGenerativeAI } = require("@google/generative-ai"),
