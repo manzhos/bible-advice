@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, TextInput, View, Button } from "react-native";
+
 // import { Button, Grid, Paper, Typography } from '@mui/material';
 
 export default function Index() {
@@ -9,24 +10,49 @@ export default function Index() {
   useEffect(() => { console.log('Question:', textQ) }, [textQ])
   useEffect(() => { console.log('Answer:', answerQ) }, [answerQ])
 
-  const { GoogleGenerativeAI } = require("@google/generative-ai");
-  // const fs = require("fs");
-  // const genAI = new GoogleGenerativeAI('AIzaSyD2_aeaVxzb9VrneQ7BCPY4eCLWEQMReSU');
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-
   async function findAnswer() {
-    console.log('textQ:', textQ)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
-    try{
-      const result = await model.generateContent([
-        textQ,
-        // {inlineData: {data: Buffer.from(fs.readFileSync('path/to/image.png')).toString("base64"), mimeType: 'image/png'}}
-      ]);
-      console.log(result.response.text());
-      setAnswerQ(result.response.text());
+    console.log('Pray:', textQ)
+    const url: string = 'https://bible-advice-2cxjc83ys-manzhos-projects.vercel.app';
+    // const url: string = 'https://bible-advice-8cjro9dpz-manzhos-projects.vercel.app/api/advice';
+
+    interface Advice {
+      message: string
+    }
+
+    interface Body {
+      textQ: string
+    }
+    let body: Body = {
+      textQ: textQ
+    }
+
+    try {
+      if (!textQ || textQ === '') {
+        setAnswerQ('You not type any question');
+        return;
+      }
+      if (url === ''){
+        setAnswerQ('God is busy. Please try to find support later.');
+      }
+
+      const response = await fetch(url, {
+        method: 'POST', 
+        mode:   'no-cors', 
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin':'no-cors',
+          'Content-Length': '*',
+          'Host': '*'
+        },
+        body:   JSON.stringify(body), 
+      });
+      console.log(response);
+      const data: Advice = await response.json();
+      console.log(data.message);
+      setAnswerQ(data.message);
     } catch (error) {
       console.log('Error:', error);
-      setAnswerQ('Your god want your money');
+      setAnswerQ('God is busy. Please try to find support later.'); //Your god want your money
     }
   }
 
@@ -39,13 +65,6 @@ export default function Index() {
         backgroundColor: "#0C0C0C",
       }}
     >
-      {/* <Text 
-        style={{
-          color: "#FFC000"
-        }}
-      >
-        Type your problem, darling.
-      </Text> */}
       <TextInput
         style={{
           backgroundColor: "#3A3A3A",
@@ -64,8 +83,9 @@ export default function Index() {
         color="#FFC000"
         accessibilityLabel="Find the answer to your problem in the Bible."
       />
-      <Text 
-        style={{
+      {answerQ !== '' &&
+        <Text 
+          style={{
           color: "#FFC000",
           marginTop:30,
           borderColor: "#FFC000",
@@ -75,7 +95,8 @@ export default function Index() {
         }}
       >
         {answerQ}
-      </Text>      
+      </Text>        
+      }
     </View>
   );
 }

@@ -33,7 +33,7 @@ app.post('/api/advice', async (req, res) => {
         question,
         // {inlineData: {data: Buffer.from(fs.readFileSync('path/to/image.png')).toString("base64"), mimeType: 'image/png'}}
       ]);
-      if (DEBUG) console.log(result.response.text());
+      if (DEBUG) console.log('ANSWER:', result.response.text());
       if(result.response.text()) res.status(200).json({message: result.response.text()});
       else res.status(200).json({message: "You problem is very difficult. You need to go to church."});
     } catch (error) {
@@ -44,7 +44,7 @@ app.post('/api/advice', async (req, res) => {
 
   if (DEBUG) console.log('request:', req.body);
   if(textQ && textQ !== '') await findAnswer(textQ);
-  else res.status(200).json({message: "You don't type a problem."});
+  // else res.status(200).json({message: "You don't type a problem."});
 });
 
 // start server
