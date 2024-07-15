@@ -12,7 +12,7 @@ export default function Index() {
 
   async function findAnswer() {
     console.log('Pray:', textQ)
-    const url: string = 'https://bible-advice-2cxjc83ys-manzhos-projects.vercel.app';
+    const url: string = 'http://5.161.127.35:3300/api/advice';
     // const url: string = 'https://bible-advice-8cjro9dpz-manzhos-projects.vercel.app/api/advice';
 
     interface Advice {
@@ -37,14 +37,14 @@ export default function Index() {
 
       const response = await fetch(url, {
         method: 'POST', 
-        mode:   'no-cors', 
+        mode: 'no-cors', 
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin':'no-cors',
-          'Content-Length': '*',
-          'Host': '*'
         },
-        body:   JSON.stringify(body), 
+        body: JSON.stringify({
+          "textQ": textQ
+        }), 
       });
       console.log(response);
       const data: Advice = await response.json();

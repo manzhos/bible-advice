@@ -15,6 +15,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/api/test', (req, res) => res.send('Hello World'));
 
 app.post('/api/advice', async (req, res) => {
+  console.log('REQ:', req);
   const { textQ } = req.body;
 
   const { GoogleGenerativeAI } = require("@google/generative-ai"),
@@ -44,7 +45,7 @@ app.post('/api/advice', async (req, res) => {
 
   if (DEBUG) console.log('request:', req.body);
   if(textQ && textQ !== '') await findAnswer(textQ);
-  // else res.status(200).json({message: "You don't type a problem."});
+  else res.status(200).json({message: "You don't type a problem."});
 });
 
 // start server
