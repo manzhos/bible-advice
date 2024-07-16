@@ -11,22 +11,13 @@ export default function Index() {
   useEffect(() => { console.log('Answer:', answerQ) }, [answerQ])
 
   async function findAnswer() {
-    console.log('Pray:', textQ)
+    // console.log('Pray:', textQ)
     const url: string = 'http://5.161.127.35:3300/api/advice';
     // const url: string = 'https://bible-advice-8cjro9dpz-manzhos-projects.vercel.app/api/advice';
 
     interface Advice {
       message: string
     }
-
-    interface Body {
-      textQ: string
-    }
-    let body: Body = {
-      textQ: textQ
-    }
-
-    let data: string = JSON.stringify(body);
 
     try {
       if (!textQ || textQ === '') {
@@ -39,17 +30,16 @@ export default function Index() {
 
       const response = await fetch(url, {
         method: 'POST', 
-        mode: 'no-cors', 
+        // mode: 'no-cors', 
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin':'no-cors',
+          // 'Access-Control-Allow-Origin':'no-cors',
         },
-        body: data, 
+        body: JSON.stringify({textQ: textQ}), 
       });
-      console.log(response);
-      const data: Advice = await response.json();
-      console.log(data.message);
-      setAnswerQ(data.message);
+      const respData: Advice = await response.json();
+      console.log(respData.message);
+      setAnswerQ(respData.message);
     } catch (error) {
       console.log('Error:', error);
       setAnswerQ('God is busy. Please try to find support later.'); //Your god want your money

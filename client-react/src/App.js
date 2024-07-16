@@ -1,31 +1,43 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 export default function App() {
-  const [textQ, onChangeTextQ] = useState('')
+  const [textQ, setTextQ] = useState('')
   const [answerQ, setAnswerQ] = useState('')
 
   useEffect(() => { console.log('Question:', textQ) }, [textQ])
   useEffect(() => { console.log('Answer:', answerQ) }, [answerQ])
 
-  const { GoogleGenerativeAI } = require("@google/generative-ai");
-  // const fs = require("fs");
-  // const genAI = new GoogleGenerativeAI('AIzaSyD2_aeaVxzb9VrneQ7BCPY4eCLWEQMReSU');
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-
   async function findAnswer() {
-    console.log('textQ:', textQ)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
-    try{
-      const result = await model.generateContent([
-        textQ,
-        // {inlineData: {data: Buffer.from(fs.readFileSync('path/to/image.png')).toString("base64"), mimeType: 'image/png'}}
-      ]);
-      console.log(result.response.text());
-      setAnswerQ(result.response.text());
+    console.log('Pray:', textQ)
+    const url = 'http://5.161.127.35:3300/api/advice';
+    // const url: string = 'https://bible-advice-8cjro9dpz-manzhos-projects.vercel.app/api/advice';
+
+    try {
+      if (!textQ || textQ === '') {
+        setAnswerQ('You not type any question');
+        return;
+      }
+      if (url === ''){
+        setAnswerQ('God is busy. Please try to find support later.');
+      }
+
+      const response = await fetch(url, {
+        method: 'POST', 
+        // mode: 'no-cors', 
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Access-Control-Allow-Origin':'no-cors',
+        },
+        body: JSON.stringify({textQ: textQ}), 
+      });
+      // console.log(response);
+      const respData = await response.json()
+      // console.log(respData);
+      setAnswerQ(respData.message);
     } catch (error) {
       console.log('Error:', error);
-      setAnswerQ('Your god want your money');
+      setAnswerQ('God is busy. Please try to find support later.'); //Your god want your money
     }
   }
 
@@ -40,13 +52,6 @@ export default function App() {
             backgroundColor: "#0C0C0C",
           }}
         >
-          {/* <Text 
-            style={{
-              color: "#FFC000"
-            }}
-          >
-            Type your problem, darling.
-          </Text> */}
           <input
             style={{
               backgroundColor: "#3A3A3A",
@@ -56,15 +61,14 @@ export default function App() {
               borderRadius: 15,
               // width: "75wh"
             }}
-            onChangeText = {onChangeTextQ}
+            onChange={(event) => {setTextQ(event.target.value)}}
             value = {textQ}
           />
-          <button
-            onPress={() => {findAnswer()}}
-            title="Ask the Bible"
-            color="#FFC000"
-            accessibilityLabel="Find the answer to your problem in the Bible."
-          />
+          <div>
+            <button onClick={() => {findAnswer()}}>
+              {'Ask the Bible'}
+            </button>
+          </div>
           <p 
             style={{
               color: "#FFC000",
