@@ -8,14 +8,13 @@ const PORT  = process.env.PORT || 3300
 const DEBUG = process.env.DEBUG|| false 
 
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/api/test', (req, res) => res.send('Hello World'));
 
 app.post('/api/advice', async (req, res) => {
-  console.log('REQ:', req);
   const { textQ } = req.body;
 
   const { GoogleGenerativeAI } = require("@google/generative-ai"),

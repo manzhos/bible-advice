@@ -26,6 +26,8 @@ export default function Index() {
       textQ: textQ
     }
 
+    let data: string = JSON.stringify(body);
+
     try {
       if (!textQ || textQ === '') {
         setAnswerQ('You not type any question');
@@ -42,9 +44,7 @@ export default function Index() {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin':'no-cors',
         },
-        body: JSON.stringify({
-          "textQ": textQ
-        }), 
+        body: data, 
       });
       console.log(response);
       const data: Advice = await response.json();
