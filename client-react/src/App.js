@@ -1,17 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
+import bible from './assets/images/bible.svg'; 
+
 export default function App() {
   const [textQ, setTextQ] = useState('')
   const [answerQ, setAnswerQ] = useState('')
+  const [typedAnswer, setTypedAnswer] = useState([])
 
-  useEffect(() => { console.log('Question:', textQ) }, [textQ])
-  useEffect(() => { console.log('Answer:', answerQ) }, [answerQ])
+  const paragraphBreaks = '* ';
+  // const paragraphs = originalString.split(paragraphBreaks);
+  // const formattedParagraphs = paragraphs.map(paragraph => `<p style="text-align: center;">${paragraph}</p>`);
+
+
+  // useEffect(() => { console.log('Question:', textQ) }, [textQ])
+  useEffect(() => { 
+    console.log('Answer:', answerQ)
+    const speed = 50
+    let i = 0
+    function type() {
+      if(answerQ.includes(paragraphBreaks)) setTypedAnswer(answerQ.split(paragraphBreaks))
+      else setTypedAnswer([answerQ])
+      if (i < answerQ.length) {
+        setTypedAnswer(prev => prev + answerQ.charAt(i)) //answerQ.charAt(i)
+        i++
+        setTimeout(type, speed)
+      }
+      console.log('typedAnswer:', typedAnswer)
+    }
+    
+    type()
+  }, [answerQ])
 
   async function findAnswer() {
     console.log('Pray:', textQ)
-    const url = 'http://5.161.127.35:3300/api/advice';
-    // const url: string = 'https://bible-advice-8cjro9dpz-manzhos-projects.vercel.app/api/advice';
+    setTypedAnswer([])
+    // const url = 'http://5.161.127.35:3300/api/advice';
+    const url = 'https://bible-advice-8cjro9dpz-manzhos-projects.vercel.app/api/advice';
 
     try {
       if (!textQ || textQ === '') {
@@ -34,6 +59,7 @@ export default function App() {
       // console.log(response);
       const respData = await response.json()
       // console.log(respData);
+      // const answer = respData.message.replace('a language model', 'Bible');
       setAnswerQ(respData.message);
     } catch (error) {
       console.log('Error:', error);
@@ -41,48 +67,58 @@ export default function App() {
     }
   }
 
+
+
   return (
     <div className="App">
-      <header className="App-header">
+      <div className="App-header">
+        <img 
+          src={bible} 
+          alt="Bible"
+          style={{
+            width: "100px",
+            margin: "30px"
+          }}
+        />
+        <input
+          style={{
+            backgroundColor: "#3A3A3A",
+            color: "#FFC000",
+            margin: 12,
+            padding: "12px 24px",
+            borderRadius: 15,
+            minWidth: "300px",
+            maxWidth: "80vw",
+            textAlign: "center"
+          }}
+          onChange={(event) => {setTextQ(event.target.value)}}
+          value = {textQ}
+        />
+        <button
+          style={{
+            padding: "10px 20px",
+            color: "#3A3A3A",
+            backgroundColor: "#FFC000",
+            borderRadius: 15,
+          }}
+          onClick={() => {findAnswer()}}
+        >
+          {'Ask the Bible'}
+        </button>
         <div
           style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "#0C0C0C",
+            marginTop:"30px",
+            padding: "24px",
+            maxWidth: "640px"            
           }}
         >
-          <input
-            style={{
-              backgroundColor: "#3A3A3A",
-              color: "#FFC000",
-              margin: 12,
-              padding: 12,
-              borderRadius: 15,
-              // width: "75wh"
-            }}
-            onChange={(event) => {setTextQ(event.target.value)}}
-            value = {textQ}
-          />
-          <div>
-            <button onClick={() => {findAnswer()}}>
-              {'Ask the Bible'}
-            </button>
-          </div>
-          <p 
-            style={{
-              color: "#FFC000",
-              marginTop:30,
-              borderColor: "#FFC000",
-              borderRadius: 15,
-              borderWidth: 1,
-              padding: 24,
-            }}
-          >
-            {answerQ}
-          </p>      
-        </div>
-      </header>
+          {typedAnswer.map((paragraph) => {
+            return(
+              <p>{paragraph}</p>
+            )
+          })}
+        </div>    
+      </div>
     </div>
   );
 }
