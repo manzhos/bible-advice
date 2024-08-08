@@ -8,29 +8,34 @@ export default function App() {
   const [answerQ, setAnswerQ] = useState('')
   const [typedAnswer, setTypedAnswer] = useState([])
 
-  const paragraphBreaks = '* ';
+  const paragraphBreaks = ['* ', '\n'];
   // const paragraphs = originalString.split(paragraphBreaks);
   // const formattedParagraphs = paragraphs.map(paragraph => `<p style="text-align: center;">${paragraph}</p>`);
 
-
-  // useEffect(() => { console.log('Question:', textQ) }, [textQ])
   useEffect(() => { 
-    console.log('Answer:', answerQ)
-    const speed = 50
-    let i = 0
-    function type() {
-      if(answerQ.includes(paragraphBreaks)) setTypedAnswer(answerQ.split(paragraphBreaks))
-      else setTypedAnswer([answerQ])
-      if (i < answerQ.length) {
-        setTypedAnswer(prev => prev + answerQ.charAt(i)) //answerQ.charAt(i)
-        i++
-        setTimeout(type, speed)
-      }
-      console.log('typedAnswer:', typedAnswer)
-    }
-    
-    type()
+    // console.log('Answer:', answerQ)
+    let paragraph = []
+
+    paragraphBreaks.map((item) => {
+      if(answerQ.includes(item)) paragraph = answerQ.split(item)
+    })
+    // console.log('paragraph:', paragraph);
+
+    if (paragraph.length) type(paragraph)
+    else setTypedAnswer([answerQ])
   }, [answerQ])
+
+  const type = (paragraph) => {
+    const speed = 500
+
+    paragraph.forEach((paragraph, index) => {
+      setTimeout(() => {
+        setTypedAnswer((prev) => [...prev, paragraph]);
+      }, index * speed);
+    });
+  }
+
+  // useEffect(()=>{console.log('>>> TA >>>', typedAnswer)}, [typedAnswer])
 
   async function findAnswer() {
     console.log('Pray:', textQ)
@@ -58,7 +63,7 @@ export default function App() {
       });
       // console.log(response);
       const respData = await response.json()
-      // console.log(respData);
+      console.log(respData);
       // const answer = respData.message.replace('a language model', 'Bible');
       setAnswerQ(respData.message);
     } catch (error) {
@@ -67,6 +72,11 @@ export default function App() {
     }
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      findAnswer();
+    }
+  }
 
 
   return (
@@ -92,6 +102,7 @@ export default function App() {
             textAlign: "center"
           }}
           onChange={(event) => {setTextQ(event.target.value)}}
+          onKeyDown={handleKeyDown}
           value = {textQ}
         />
         <button
@@ -112,9 +123,9 @@ export default function App() {
             maxWidth: "640px"            
           }}
         >
-          {typedAnswer.map((paragraph) => {
+          {typedAnswer.map((block) => {
             return(
-              <p>{paragraph}</p>
+              <p>{block}</p>
             )
           })}
         </div>    
